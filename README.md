@@ -1,42 +1,57 @@
 # User Dashboard Web Application
 
-A secure, role-based web application built with Next.js, Firebase Authentication, and Firestore. This application provides a comprehensive dashboard for managing user data with advanced analytics and statistics.
+A secure, role-based web application built with Next.js, Firebase Authentication, and Firestore. This application provides a comprehensive dashboard for managing user data with advanced analytics, real-time updates, and a modern, professional UI.
 
-## Features
+## ✨ Features
 
-### Authentication & Authorization
+### 🔐 Dynamic Authentication & Authorization
 
-- **Role-based access control** with predefined email authorization
+- **Dynamic admin system** with Firestore-based email management
+- **Role-based access control** with real-time admin email validation
 - **Secure session management** with token-based authentication
 - **Email/password authentication** with Firebase Auth
-- **Middleware protection** for secure routes
+- **Intelligent caching** (5-minute cache for admin emails)
 - **Automatic redirects** based on authentication status
 
-### Dashboard Features
+### 📊 Advanced Dashboard Features
 
-- **Comprehensive data table** displaying all user documents
-- **Real-time statistics** with demographic breakdowns
-- **Search and filtering** capabilities
-- **Data export** to CSV format
-- **Responsive design** with modern UI components
+- **Real-time data table** with live Firestore synchronization
+- **Professional user profile dialogs** with detailed information
+- **Comprehensive statistics** with demographic breakdowns
+- **Advanced search and filtering** capabilities
+- **CSV data export** functionality
+- **Responsive design** with mobile-first approach
+- **Theme toggle** (light/dark mode) with system preference detection
 
-### Data Management
+### 🎨 Modern UI/UX
+
+- **shadcn/ui components** with Tailwind CSS styling
+- **Professional, minimalistic design** with attention to detail
+- **Consistent color theming** using CSS variables
+- **Responsive navigation** with mobile-friendly menu
+- **Accessible components** with proper ARIA labels
+- **Smooth animations** and transitions
+
+### 📱 Data Management
 
 - **Firestore integration** for real-time data synchronization
 - **Type-safe data models** with TypeScript interfaces
-- **Aggregation queries** for statistics calculation
-- **Document tracking** with unique IDs
+- **Advanced aggregation queries** for statistics calculation
+- **Document tracking** with unique IDs and copy functionality
+- **File download support** for user documents
 
-## Tech Stack
+## 🛠️ Tech Stack
 
 - **Frontend**: Next.js 15, React 19, TypeScript
 - **UI Components**: shadcn/ui with Tailwind CSS
 - **Authentication**: Firebase Authentication
 - **Database**: Cloud Firestore
 - **Icons**: Lucide React
+- **Theming**: next-themes for dark/light mode
 - **Package Manager**: Bun
+- **Styling**: Tailwind CSS with CSS variables
 
-## Prerequisites
+## 📋 Prerequisites
 
 Before running this application, ensure you have:
 
@@ -44,8 +59,9 @@ Before running this application, ensure you have:
 2. **Bun** package manager
 3. **Firebase project** with Authentication and Firestore enabled
 4. **Firebase configuration** credentials
+5. **Modern browser** with JavaScript enabled
 
-## Installation
+## 🚀 Installation
 
 1. **Clone the repository**
 
@@ -102,21 +118,31 @@ Before running this application, ensure you have:
    │   ├── tratamientoDatosPersonales: boolean
    │   ├── createdAt: Timestamp
    │   └── updatedAt: Timestamp
+
+   system_variables/
+   └── access/
+       ├── admin: ["admin1@example.com", "admin2@example.com"]
+       ├── createdAt: Timestamp
+       └── updatedAt: Timestamp
    ```
 
-6. **Configure authorized users**
+6. **Set up Dynamic Admin System**
 
-   Update the `ALLOWED_USERS` array in `src/lib/auth.ts`:
+   Run the setup script to configure admin emails:
 
-   ```typescript
-   const ALLOWED_USERS: AllowedUser[] = [
-     { email: "admin@example.com", role: "admin", isActive: true },
-     { email: "user1@example.com", role: "user", isActive: true },
-     // Add more users as needed
-   ];
+   ```bash
+   bun run setup-admin-emails
    ```
 
-## Running the Application
+   Or manually create the `system_variables/access` document in Firestore with an `admin` array field containing your admin email addresses.
+
+7. **Test the system**
+
+   ```bash
+   bun run test-admin-system
+   ```
+
+## 🏃‍♂️ Running the Application
 
 1. **Start the development server**
 
@@ -130,118 +156,171 @@ Before running this application, ensure you have:
 
 3. **Sign in**
 
-   Use one of the authorized email addresses to sign in or create a new account.
+   Use one of the admin email addresses configured in the `system_variables/access` document to sign in.
 
-## Project Structure
+## 📁 Project Structure
 
 ```
 src/
 ├── app/
 │   ├── auth/
 │   │   └── login/
-│   │       └── page.tsx          # Login/signup page
+│   │       └── page.tsx              # Login page
 │   ├── dashboard/
-│   │   └── page.tsx              # Main dashboard
-│   ├── layout.tsx                # Root layout with auth provider
-│   └── page.tsx                  # Landing page
+│   │   └── page.tsx                  # Main dashboard
+│   ├── layout.tsx                    # Root layout with providers
+│   ├── globals.css                   # Global styles and theme variables
+│   └── page.tsx                      # Landing page
 ├── components/
 │   ├── auth/
-│   │   ├── LoginForm.tsx         # Login form component
-│   │   └── SignUpForm.tsx        # Signup form component
+│   │   └── LoginForm.tsx             # Login form component
 │   ├── dashboard/
-│   │   ├── DataTable.tsx         # Data table component
-│   │   └── StatisticsCards.tsx   # Statistics cards component
-│   └── ui/                       # shadcn/ui components
+│   │   ├── DataTable.tsx             # Data table with user profiles
+│   │   └── StatisticsCards.tsx       # Statistics cards component
+│   ├── navigation/
+│   │   └── Navbar.tsx                # Responsive navigation component
+│   ├── theme/
+│   │   ├── ThemeProvider.tsx         # Theme context provider
+│   │   └── ThemeToggle.tsx           # Theme toggle component
+│   └── ui/                           # shadcn/ui components
 ├── contexts/
-│   └── AuthContext.tsx           # Authentication context
+│   └── AuthContext.tsx               # Authentication context
 ├── lib/
-│   ├── auth.ts                   # Authentication service
-│   ├── firebase.ts               # Firebase configuration
-│   └── firestore.ts              # Firestore service
+│   ├── auth.ts                       # Dynamic authentication service
+│   ├── firebase.ts                   # Firebase configuration
+│   └── firestore.ts                  # Firestore service with admin management
 ├── types/
-│   └── user.ts                   # TypeScript interfaces
-└── middleware.ts                 # Route protection middleware
+│   └── user.ts                       # TypeScript interfaces
+├── middleware.ts                     # Route protection middleware
+└── scripts/                          # Utility scripts
+    ├── setup-admin-emails.ts         # Admin system setup
+    ├── test-admin-system.ts          # System testing
+    └── seed.ts                       # Database seeding
 ```
 
-## Key Features Explained
+## 🔑 Key Features Explained
 
-### Authentication System
+### 🔐 Dynamic Authentication System
 
-The application uses a custom authentication service that:
+The application uses a sophisticated authentication service that:
 
-- Validates emails against a predefined list
-- Assigns roles (admin/user) based on email
-- Generates secure session tokens
-- Implements middleware for route protection
+- **Fetches admin emails dynamically** from Firestore `system_variables/access` document
+- **Intelligent caching** with 5-minute cache duration to optimize performance
+- **Real-time validation** of admin emails on every login attempt
+- **Secure session management** with token-based authentication
+- **Automatic cache refresh** when admin emails are updated
+- **Fallback mechanisms** for network errors and offline scenarios
 
-### Data Model
+### 📊 Advanced Data Management
 
-The Firestore data model follows a specific schema:
+The Firestore data model follows a comprehensive schema:
 
-- **Personal Information**: name, surname, ID document, phone, gender
+- **Personal Information**: name, surname, ID document, phone, gender, birth date
 - **Location Data**: department and city of residence
-- **Document Management**: URL to identity document
-- **Consent Tracking**: terms acceptance and data policy agreements
-- **Metadata**: creation and update timestamps
+- **Document Management**: URL to identity document with download functionality
+- **Consent Tracking**: terms acceptance and data policy agreements with visual indicators
+- **Metadata**: creation and update timestamps with real-time synchronization
 
-### Statistics Generation
+### 📈 Real-time Statistics & Analytics
 
-The application calculates comprehensive statistics:
+The application provides comprehensive real-time statistics:
 
 - **Demographic breakdowns** by gender, department, and city
-- **Acceptance rates** for terms and policies
+- **Acceptance rates** for terms and policies with visual indicators
 - **Age group distribution** based on birth dates
-- **Total user counts** and aggregations
+- **Total user counts** and aggregations with live updates
+- **Real-time data synchronization** using Firestore listeners
 
-### Security Features
+### 🎨 Modern UI/UX Features
 
-- **Role-based access control** with predefined user authorization
-- **Session token validation** with expiration
+- **Professional user profile dialogs** with detailed information display
+- **Theme toggle** with light/dark mode support and system preference detection
+- **Responsive navigation** with mobile-friendly hamburger menu
+- **Advanced data table** with search, filtering, and export capabilities
+- **Copy-to-clipboard** functionality for user IDs
+- **Professional styling** with consistent color theming using CSS variables
+
+### 🔒 Security & Performance
+
+- **Dynamic admin management** without code changes or redeployment
+- **Session token validation** with 24-hour expiration
 - **Middleware protection** for sensitive routes
-- **Input validation** and error handling
+- **Input validation** and comprehensive error handling
 - **Secure Firebase configuration** with environment variables
+- **Optimized caching** to reduce Firestore read operations
 
-## API Reference
+## 📚 API Reference
 
-### Authentication Service
+### 🔐 Authentication Service
 
 ```typescript
-// Sign in with email and password
+// Sign in with email and password (validates against dynamic admin list)
 await authService.signIn(email: string, password: string)
-
-// Sign up with email and password
-await authService.signUp(email: string, password: string)
 
 // Sign out
 await authService.signOut()
 
 // Get current user with role
 await authService.getCurrentUser()
+
+// Check if email is allowed (async)
+await authService.isEmailAllowed(email: string)
+
+// Get user role (async)
+await authService.getUserRole(email: string)
+
+// Clear admin emails cache
+authService.clearAdminEmailsCache()
+
+// Force refresh admin emails from Firestore
+await authService.refreshAdminEmails()
 ```
 
-### Firestore Service
+### 🗄️ Firestore Service
 
 ```typescript
-// Get all users
+// User Management
 await firestoreService.getAllUsers()
-
-// Get user by ID
 await firestoreService.getUserById(userId: string)
-
-// Add new user
 await firestoreService.addUser(userData: UserData)
-
-// Update user
 await firestoreService.updateUser(userId: string, data: Partial<UserData>)
-
-// Delete user
 await firestoreService.deleteUser(userId: string)
 
-// Get statistics
+// Statistics
 await firestoreService.getUserStatistics()
+
+// Real-time Listeners
+firestoreService.subscribeToUsers(onUpdate, onError)
+firestoreService.subscribeToUserStatistics(onUpdate, onError)
+
+// Admin Management (NEW)
+await firestoreService.getAdminEmails()
+await firestoreService.updateAdminEmails(emails: string[])
+await firestoreService.addAdminEmail(email: string)
+await firestoreService.removeAdminEmail(email: string)
 ```
 
-## Deployment
+## 🛠️ Available Scripts
+
+```bash
+# Development
+bun run dev                    # Start development server
+bun run build                  # Build for production
+bun run start                  # Start production server
+bun run lint                   # Run ESLint
+
+# Database Management
+bun run seed                   # Seed database with sample data
+bun run clear-db               # Clear all user data
+bun run reset-db               # Reset database (clear + seed)
+bun run add-test-user          # Add a single test user
+
+# Admin System
+bun run setup-admin-emails     # Set up admin emails in Firestore
+bun run test-admin-system      # Test the admin system functionality
+```
+
+## 🚀 Deployment
 
 1. **Build the application**
 
@@ -259,7 +338,61 @@ await firestoreService.getUserStatistics()
 
    The application is ready for deployment to any platform that supports Next.js.
 
-## Environment Variables
+4. **Environment Variables**
+
+   Make sure to set all required environment variables in your deployment platform.
+
+## 🔧 Dynamic Admin System
+
+The application features a sophisticated dynamic admin system that allows you to manage admin access without code changes or redeployment.
+
+### Key Benefits:
+
+- **No redeployment required** when adding/removing admins
+- **Real-time validation** of admin emails
+- **Intelligent caching** for optimal performance
+- **Easy management** through Firebase Console or programmatically
+
+### Managing Admin Emails:
+
+#### Via Firebase Console:
+
+1. Go to Firestore Database
+2. Navigate to `system_variables/access`
+3. Edit the `admin` array field
+4. Add/remove email addresses as needed
+
+#### Via Scripts:
+
+```bash
+# Set up initial admin emails
+bun run setup-admin-emails
+
+# Test the admin system
+bun run test-admin-system
+```
+
+#### Programmatically:
+
+```typescript
+import { firestoreService } from "@/lib/firestore";
+
+// Add admin email
+await firestoreService.addAdminEmail("newadmin@example.com");
+
+// Remove admin email
+await firestoreService.removeAdminEmail("oldadmin@example.com");
+
+// Update entire list
+await firestoreService.updateAdminEmails([
+  "admin1@example.com",
+  "admin2@example.com",
+]);
+```
+
+For detailed documentation, see [docs/ADMIN_SYSTEM.md](docs/ADMIN_SYSTEM.md).
+
+## 📋 Environment Variables
 
 | Variable                                   | Description                  |
 | ------------------------------------------ | ---------------------------- |
@@ -270,18 +403,35 @@ await firestoreService.getUserStatistics()
 | `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID` | Firebase messaging sender ID |
 | `NEXT_PUBLIC_FIREBASE_APP_ID`              | Firebase app ID              |
 
-## Contributing
+## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
 3. Make your changes
 4. Add tests if applicable
-5. Submit a pull request
+5. Commit your changes (`git commit -m 'Add some amazing feature'`)
+6. Push to the branch (`git push origin feature/amazing-feature`)
+7. Open a Pull Request
 
-## License
+## 📄 License
 
-This project is licensed under the MIT License.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Support
+## 🆘 Support
 
-For support and questions, please contact the development team or create an issue in the repository.
+For support and questions:
+
+- **Documentation**: Check the [docs/](docs/) folder for detailed guides
+- **Issues**: Create an issue in the repository
+- **Admin System**: See [docs/ADMIN_SYSTEM.md](docs/ADMIN_SYSTEM.md) for admin management
+- **Contact**: Reach out to the development team
+
+## 🎯 Roadmap
+
+- [ ] User role management (beyond admin)
+- [ ] Advanced filtering and search
+- [ ] Data visualization charts
+- [ ] Bulk operations for user management
+- [ ] Email notifications
+- [ ] Audit logging
+- [ ] API endpoints for external integrations
