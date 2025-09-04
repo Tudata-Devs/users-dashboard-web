@@ -31,6 +31,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [role, setRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [sessionToken, setSessionToken] = useState<string | null>(null);
+  const [isRedirecting, setIsRedirecting] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -54,12 +55,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           );
           setSessionToken(token);
           localStorage.setItem("sessionToken", token);
+          document.cookie = `sessionToken=${token}; path=/; max-age=${
+            24 * 60 * 60
+          }; SameSite=Lax`;
           console.log("Session token generated and stored");
         }
       } catch (error) {
         console.error("Auth initialization error:", error);
       } finally {
         setLoading(false);
+        setIsRedirecting(false);
       }
     };
 
@@ -72,21 +77,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       loading,
       user: !!user,
       role,
+      isRedirecting,
       pathname:
         typeof window !== "undefined" ? window.location.pathname : "server",
     });
 
-    if (!loading && user && role) {
+    if (!loading && user && role && !isRedirecting) {
       // Only redirect if we're not already on the dashboard
       if (
         typeof window !== "undefined" &&
         !window.location.pathname.startsWith("/dashboard")
       ) {
         console.log("Redirecting to dashboard...");
-        window.location.href = "/dashboard";
+        setIsRedirecting(true);
+
+        // Add a timeout to reset redirecting flag in case of issues
+        const timeoutId = setTimeout(() => {
+          console.log("Redirect timeout, resetting flag");
+          setIsRedirecting(false);
+        }, 5000);
+
+        router.push("/dashboard");
+
+        // Clear timeout if component unmounts
+        return () => clearTimeout(timeoutId);
       }
     }
-  }, [user, role, loading, router]);
+  }, [user, role, loading, isRedirecting, router]);
 
   const signIn = async (email: string, password: string) => {
     try {
@@ -103,11 +120,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         userRole
       );
       setSessionToken(token);
-      localStorage.setItem("sessionToken", token);
 
-      // Redirect to dashboard after successful sign in
+      // Store in both localStorage and cookies for compatibility
+      localStorage.setItem("sessionToken", token);
+      document.cookie = `sessionToken=${token}; path=/; max-age=${
+        24 * 60 * 60
+      }; SameSite=Lax`;
+
+      // Use router.push instead of window.location.href for better Next.js integration
       console.log("Sign in successful, redirecting to dashboard...");
-      window.location.href = "/dashboard";
+      setIsRedirecting(true);
+      router.push("/dashboard");
     } catch (error) {
       throw error;
     } finally {
@@ -122,7 +145,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       setUser(null);
       setRole(null);
       setSessionToken(null);
+      setIsRedirecting(false);
       localStorage.removeItem("sessionToken");
+      // Clear cookie
+      document.cookie =
+        "sessionToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
     } catch (error) {
       throw error;
     } finally {

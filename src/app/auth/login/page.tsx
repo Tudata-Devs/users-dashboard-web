@@ -3,6 +3,7 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { LoginForm } from "@/components/auth/LoginForm";
 import { Navbar } from "@/components/navigation/Navbar";
+import { AuthDebug } from "@/components/debug/AuthDebug";
 import { Shield } from "lucide-react";
 
 export default function LoginPage() {
@@ -63,6 +64,9 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
+
+      {/* Debug Component */}
+      <AuthDebug />
     </div>
   );
 }
